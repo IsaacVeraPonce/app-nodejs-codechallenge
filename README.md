@@ -24,54 +24,56 @@ Este proyecto es parte de un desafío de código para Yape. Implementa un servic
 
 ```json
 {
-  GetTransaction {
-    transactionExternalId
-    accountExternalIdDebit
-    accountExternalIdCredit
-    transferTypeId {
-      name
+  "query": "{
+    GetTransaction {
+      transactionExternalId
+      accountExternalIdDebit
+      accountExternalIdCredit
+      transferTypeId {
+        name
+      }
+      transactionStatus {
+        name
+      }
+      value
+      status
+      createdAt
     }
-    transactionStatus {
-      name
+  }",
+  "mutation": "mutation {
+    CreateTransaction(accountExternalIdDebit: \"GUID\", accountExternalIdCredit: \"GUID\", transferTypeId: 1, value: 1) {
+      transactionExternalId
+      accountExternalIdDebit
+      accountExternalIdCredit
+      transferTypeId {
+        name
+      }
+      transactionStatus {
+        name
+      }
+      value
+      status
+      createdAt
     }
-    value
-    status
-    createdAt
-  }
+  }",
+  "queryById": "{
+    GetTransactionWhereID(transactionExternalId: \"Guid\") {
+      transactionExternalId
+      accountExternalIdDebit
+      accountExternalIdCredit
+      transferTypeId {
+        name
+      }
+      transactionStatus {
+        name
+      }
+      value
+      status
+      createdAt
+    }
+  }"
 }
 
-mutation{
-  CreateTransaction(accountExternalIdDebit:"GUID", accountExternalIdCredit:"GUID",transferTypeId:1,value:1) {
-    transactionExternalId
-    accountExternalIdDebit
-    accountExternalIdCredit
-    transferTypeId {
-      name
-    }
-    transactionStatus {
-      name
-    }
-    value
-    status
-    createdAt
-  }
-}
-{
-  GetTransactionWhereID(transactionExternalId:"Guid") {
-    transactionExternalId
-    accountExternalIdDebit
-    accountExternalIdCredit
-    transferTypeId {
-      name
-    }
-    transactionStatus {
-      name
-    }
-    value
-    status
-    createdAt
-  }
-}
 
 ```
 
