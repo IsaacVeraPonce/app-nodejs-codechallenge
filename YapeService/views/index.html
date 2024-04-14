@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>GraphQL Client</title>
+	</head>
+	<body>
+		<h1>GraphQL Client</h1>
+
+		<!-- Formulario para obtener datos por ID -->
+		<h2>Obtener datos por ID</h2>
+		<form id="getTransactionForm">
+			<label for="transactionId">ID de transacción:</label>
+			<input type="text" id="transactionId" name="transactionId" />
+			<button type="submit">Obtener datos</button>
+		</form>
+		<div id="getTransactionResult"></div>
+
+		<!-- Formulario para insertar datos -->
+		<h2>Insertar datos</h2>
+		<form id="createTransactionForm">
+			<h2>Generar valores UUID</h2>
+			<label for="debitId">ID de débito:</label>
+			<input type="text" id="debitId" name="debitId" readonly />
+			<button id="generateDebitIdButton" type="button">Generar</button>
+			<label for="creditId">ID de crédito:</label>
+			<input type="text" id="creditId" name="creditId" readonly />
+			<button id="generateCreditIdButton" type="button">Generar</button>
+			<label for="transferTypeId">ID de tipo de transferencia:</label>
+			<input type="number" id="transferTypeId" name="transferTypeId" />
+			<label for="value">Valor:</label>
+			<input type="number" id="value" name="value" />
+			<button type="submit">Insertar datos</button>
+		</form>
+		<div id="createTransactionResult"></div>
+
+		<!-- Suscripción a cambios de datos -->
+		<h2>Suscripción a cambios de datos</h2>
+		<div id="subscriptionResult"></div>
+
+		<script>
+			document.getElementById('generateDebitIdButton').addEventListener('click', function () {
+				document.getElementById('debitId').value = crypto.randomUUID();
+			});
+			document.getElementById('generateCreditIdButton').addEventListener('click', function () {
+				document.getElementById('creditId').value = crypto.randomUUID();
+			});
+			document.getElementById('getTransactionForm').addEventListener('submit', async function (event) {
+				event.preventDefault();
+
+				const transactionId = document.getElementById('transactionId').value;
+
+				const query = `
+			     query GetTransaction($transactionId: ID!) {
+			       GetTransactionWhereID(transactionExternalId: $transactionId) {
+			         accountExternalIdDebit
+			         transactionExternalId
+			         transferTypeId {
+			           name
+			         }
+			         transactionStatus {
+			           name
+			         }
+			         value
+			         createdAt
+			       }
+			     }
+			   `;
+
+				const variables = { transactionId };
+
+				const response = await fetch('http://localhost:3000/graphql', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ query, variables }),
+				});
+
+				const data = await response.json();
+				document.getElementById('getTransactionResult').innerText = JSON.stringify(data, null, 2);
+			});
+
+			document.getElementById('createTransactionForm').addEventListener('submit', async function (event) {
+				event.preventDefault();
+
+				const transferTypeId = document.getElementById('transferTypeId').value;
+				const value = document.getElementById('value').value;
+				const accountExternalIdDebit = document.getElementById('debitId').value;
+				const accountExternalIdCredit = document.getElementById('creditId').value;
+				const mutation = `
+			     mutation CreateTransaction($accountExternalIdDebit: ID!,$accountExternalIdCredit: ID!,$transferTypeId: Int!, $value: Int!) {
+			       CreateTransaction(accountExternalIdDebit:$accountExternalIdDebit, accountExternalIdCredit:$accountExternalIdCredit, transferTypeId: $transferTypeId, value: $value) {
+			         accountExternalIdDebit
+			         accountExternalIdCredit
+			         transactionExternalId
+			         transferTypeId {
+			           name
+			         }
+			         transactionStatus {
+			           name
+			         }
+			         value
+			         createdAt
+			       }
+			     }
+			   `;
+
+				const variables = { transferTypeId: parseInt(transferTypeId), value: parseInt(value), accountExternalIdDebit, accountExternalIdCredit };
+
+				const response = await fetch('http://localhost:3000/graphql', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ query: mutation, variables }),
+				});
+
+				const data = await response.json();
+				document.getElementById('createTransactionResult').innerText = JSON.stringify(data, null, 2);
+			});
+
+			// // Suscripción a cambios de datos (no se puede implementar en un cliente GraphQL mediante fetch, se necesita una conexión WebSocket)
+			// document.getElementById('subscriptionResult').innerText = 'Esta funcionalidad no está implementada en un cliente GraphQL mediante fetch.';
+		</script>
+	</body>
+</html>

@@ -1,82 +1,89 @@
-# Yape Code Challenge :rocket:
+# Yape Code Challenge
 
-Our code challenge will let you marvel us with your Jedi coding skills :smile:. 
+## Autor
 
-Don't forget that the proper way to submit your work is to fork the repo and create a PR :wink: ... have fun !!
+Isaac Vera Ponce
+ivera.bts@gmail.com
 
-- [Problem](#problem)
-- [Tech Stack](#tech_stack)
-- [Send us your challenge](#send_us_your_challenge)
+## Descripción del Proyecto
 
-# Problem
+Este proyecto es parte de un desafío de código para Yape. Implementa un servicio utilizando Node.js con Express, Graphql y Kafka.
 
-Every time a financial transaction is created it must be validated by our anti-fraud microservice and then the same service sends a message back to update the transaction status.
-For now, we have only three transaction statuses:
+## Tecnologías Utilizadas
 
-<ol>
-  <li>pending</li>
-  <li>approved</li>
-  <li>rejected</li>  
-</ol>
+- Node.js con Express
+- Graphql
+- Kafka
 
-Every transaction with a value greater than 1000 should be rejected.
+## URLs
 
-```mermaid
-  flowchart LR
-    Transaction -- Save Transaction with pending Status --> transactionDatabase[(Database)]
-    Transaction --Send transaction Created event--> Anti-Fraud
-    Anti-Fraud -- Send transaction Status Approved event--> Transaction
-    Anti-Fraud -- Send transaction Status Rejected event--> Transaction
-    Transaction -- Update transaction Status event--> transactionDatabase[(Database)]
-```
+- GraphiQL: [localhost:3333/graphql](http://localhost:3333/graphql)
+- Testing Visual: [localhost:3333/](http://localhost:3333/)
 
-# Tech Stack
-
-<ol>
-  <li>Node. You can use any framework you want (i.e. Nestjs with an ORM like TypeOrm or Prisma) </li>
-  <li>Any database</li>
-  <li>Kafka</li>    
-</ol>
-
-We do provide a `Dockerfile` to help you get started with a dev environment.
-
-You must have two resources:
-
-1. Resource to create a transaction that must containt:
+## Querys Disponibles
 
 ```json
 {
-  "accountExternalIdDebit": "Guid",
-  "accountExternalIdCredit": "Guid",
-  "tranferTypeId": 1,
-  "value": 120
+  GetTransaction {
+    transactionExternalId
+    accountExternalIdDebit
+    accountExternalIdCredit
+    transferTypeId {
+      name
+    }
+    transactionStatus {
+      name
+    }
+    value
+    status
+    createdAt
+  }
 }
-```
 
-2. Resource to retrieve a transaction
-
-```json
+mutation{
+  CreateTransaction(accountExternalIdDebit:"GUID", accountExternalIdCredit:"GUID",transferTypeId:1,value:1) {
+    transactionExternalId
+    accountExternalIdDebit
+    accountExternalIdCredit
+    transferTypeId {
+      name
+    }
+    transactionStatus {
+      name
+    }
+    value
+    status
+    createdAt
+  }
+}
 {
-  "transactionExternalId": "Guid",
-  "transactionType": {
-    "name": ""
-  },
-  "transactionStatus": {
-    "name": ""
-  },
-  "value": 120,
-  "createdAt": "Date"
+  GetTransactionWhereID(transactionExternalId:"Guid") {
+    transactionExternalId
+    accountExternalIdDebit
+    accountExternalIdCredit
+    transferTypeId {
+      name
+    }
+    transactionStatus {
+      name
+    }
+    value
+    status
+    createdAt
+  }
 }
+
 ```
 
-## Optional
+## Captura de Pantalla del Testing
 
-You can use any approach to store transaction data but you should consider that we may deal with high volume scenarios where we have a huge amount of writes and reads for the same data at the same time. How would you tackle this requirement?
+![TestingG](graphiql.png)
+![Testing](index.png)
 
-You can use Graphql;
+## Comandos
 
-# Send us your challenge
+Para ejecutar el servicio completo con kafka utilizar:
 
-When you finish your challenge, after forking a repository, you **must** open a pull request to our repository. There are no limitations to the implementation, you can follow the programming paradigm, modularization, and style that you feel is the most appropriate solution.
-
-If you have any questions, please let us know.
+```bash
+docker-compose up --build --force-recreate -d
+```
