@@ -14,4 +14,4 @@ RUN npm install
 EXPOSE 3000
 
 # Ejecuta el comando para iniciar la API 
-CMD [ "npm","run", "start:dev" ]
+CMD [ "npm","run", "dev" ]
